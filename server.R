@@ -1,19 +1,11 @@
 library(shiny)
 library(datasets)
 library(forecast)
-library(plyr)
 library(zoo) 
 library(xts) 
 library(dygraphs)
-library(lubridate)
 
 shinyServer(function(input, output) {
-  
-  #if(input$datasetvar=="own"){
-   # output$uploadControl <- renderUI({
-    #  sliderInput("breakCount", "Break Count", min=1, max=1000, value=10)
-    #})
-  #}
   
   getDataset <- reactive({
     if (input$datasetvar=="AirPassengers")
@@ -37,7 +29,6 @@ shinyServer(function(input, output) {
       csvInput <- read.csv(inFile$datapath, header=input$header, sep=input$sep, 
                           quote=input$quote)
       csvInput[[input$dateColumnName]] <- as.Date(as.yearmon(csvInput[[input$dateColumnName]], input$dateFormat))
-      #x <- xts(csvInput[[input$dataColumnName]], order.by=csvInput[[input$dateColumnName]])
       
       strt <- first(csvInput[[input$dateColumnName]])
       strt <- c(year(strt), month(strt))      
@@ -98,7 +89,6 @@ shinyServer(function(input, output) {
       dySeries("actual", label = "Actual") %>%
       dySeries(c("lwr", "predicted", "upr"), label = "Predicted") %>%
       dyRangeSelector(height = 20)
-    #dygraph(fitForecast$x)
   })
   
   output$epxSmoothing <- renderUI({
@@ -138,14 +128,6 @@ shinyServer(function(input, output) {
       dySeries("actual", label = "Actual") %>%
       dySeries(c("lwr", "predicted", "upr"), label = "Predicted") %>%
       dyRangeSelector(height = 20)
-    #dygraph(fitForecast$x)
-  })
-  
-  output$sarimaForecastPlot <- renderPlot({
-    order = c(0,1,1)
-    seasonal = list(order = c(0,1,1))
-    fit <- arima(getDataset(), order, seasonal)
-    plot(forecast(fit, h=input$ahead))
   })
   
 })

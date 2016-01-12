@@ -101,7 +101,6 @@ shinyUI(pageWithSidebar(
     tabsetPanel(
       tabPanel("EXPONENTIAL SMOOTHING", fluidRow(uiOutput("epxSmoothing"), uiOutput("expSmoothingAccuracy"))),
       tabPanel("Arima Forecast", fluidRow(uiOutput("arimaForecast"), uiOutput("arimaForecastAccuracy"))),
-      tabPanel("Sarima Forecast", plotOutput("sarimaForecastPlot")),
       tabPanel("Timeseries Decomposition", plotOutput("dcompPlot"))
     ),
     
