@@ -36,7 +36,7 @@ shinyServer(function(input, output) {
       endTS <- last(csvInput[[input$dateColumnName]])
       endTS <- c(year(endTS), month(endTS))      
       
-      x <- ts(csvInput[[input$dataColumnName]], start = strt, end = endTS, frequency = input$frequencyInput)
+      x <- ts(csvInput[[input$dataColumnName]], start = strt, frequency = input$frequencyInput)
       return(x)
       
       x <- ts(x, start = strt, end = endTS, frequency = input$frequencyInput)
@@ -82,7 +82,7 @@ shinyServer(function(input, output) {
     upper[] <- fitForecast$upper[,2]
     
     fitMerged <- cbind(lwr=lower, predicted=c(fitForecast$fitted, fitForecast$mean), upr=upper, actual=fitForecast$x, deparse.level = 1)
-    fitMerged <- ts(fitMerged, frequency = 12, start = strt, end = endTS)
+    fitMerged <- ts(fitMerged, frequency = 12, start = strt)
     
     output$accuracyArima <- renderTable(accuracy(fitForecast))
     
@@ -121,7 +121,7 @@ shinyServer(function(input, output) {
     upper[] <- fitForecast$upper[,2]
     fitMerged <- cbind(lwr=lower, predicted=c(fitForecast$fitted, fitForecast$mean), upr=upper, actual=fitForecast$x, deparse.level = 1)
    
-    fitMerged <- ts(fitMerged, frequency = 12, start = strt, end = endTS)
+    fitMerged <- ts(fitMerged, frequency = 12, start = strt)
     
     output$accuracyEts <- renderTable(accuracy(fitForecast))
     
