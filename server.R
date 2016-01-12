@@ -4,6 +4,7 @@ library(forecast)
 library(zoo) 
 library(xts) 
 library(dygraphs)
+library(lubridate)
 
 shinyServer(function(input, output) {
   
