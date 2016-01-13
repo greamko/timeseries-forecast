@@ -58,18 +58,27 @@ shinyServer(function(input, output) {
     dygraphOutput("arimaForecastPlot")
   })
   
-  output$arimaForecastAccuracy <- renderUI({
+  output$arimaForecastAccuracyOut <- renderUI({
     tags$div( class = "accuracyOut",
               tags$h2("Accuracy"),
-              tableOutput("accuracyArima")
+              tableOutput("accuracyArimaOut")
     )
   })
   
   output$arimaForecastPlot <- renderDygraph({
-    fit <- auto.arima(getDataset())
+    dataSet <- getDataset()
+    fit <- auto.arima(dataSet)
     
     fitForecast <- forecast(fit, h=input$ahead)
     
+    modelLength <- length(dataSet)
+    
+    accuracyTestStart <- modelLength - round(modelLength / 10)
+    testFit <- auto.arima(window(dataSet,end = index(dataSet)[accuracyTestStart-1]))
+    testForecast <- forecast(testFit, h=round(modelLength / 10))
+    
+    output$accuracyArimaOut <- renderTable(accuracy(testForecast, window(dataSet, start = index(dataSet)[accuracyTestStart])))
+
     strt <- date_decimal(first(index(fitForecast$x)))
     strt <- c(year(strt), month(strt))
     
@@ -84,8 +93,6 @@ shinyServer(function(input, output) {
     fitMerged <- cbind(lwr=lower, predicted=c(fitForecast$fitted, fitForecast$mean), upr=upper, actual=fitForecast$x, deparse.level = 1)
     fitMerged <- ts(fitMerged, frequency = 12, start = strt)
     
-    output$accuracyArima <- renderTable(accuracy(fitForecast))
-    
     dygraph(fitMerged, main = fitForecast$method) %>%
       dySeries("actual", label = "Actual") %>%
       dySeries(c("lwr", "predicted", "upr"), label = "Predicted") %>%
@@ -96,15 +103,27 @@ shinyServer(function(input, output) {
     dygraphOutput("etsPlot")
   })
   
-  output$expSmoothingAccuracy <- renderUI({
+  output$expSmoothingAccuracyOut <- renderUI({
     tags$div( class = "accuracyOut",
               tags$h2("Accuracy"),
-              tableOutput("accuracyEts")
+              tableOutput("accuracyEtsOut")
     )
   })
   
   output$etsPlot <-   renderDygraph({
-    fit <- ets(getDataset())
+    dataSet <- getDataset()
+    fit <- ets(dataSet)
+    
+    fitForecast <- forecast(fit, h=input$ahead)
+    
+    modelLength <- length(dataSet)
+    
+    accuracyTestStart <- modelLength - round(modelLength / 10)
+    testFit <- ets(window(dataSet, end = index(dataSet)[accuracyTestStart-1]))
+    testForecast <- forecast(testFit, h=round(modelLength / 10))
+    
+    output$accuracyEtsOut <- renderTable(accuracy(testForecast, window(dataSet, start = index(dataSet)[accuracyTestStart])))
+    
     
     fitForecast <- forecast(fit, h=input$ahead)
     
