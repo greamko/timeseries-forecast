@@ -14,9 +14,19 @@ shinyUI(pageWithSidebar(
                      "Australian total wine sales" = "wineind",
                      "Australian monthly gas production" = "gas",
                      "Own" = "own")),
+    
+    selectInput("forecastMethod", "Forecast Method:",
+                list("Arima" = "arima", 
+                     "Ets" = "ets",
+                     "Holt Winters" = "hw",
+                     "Nnetar" = "nnetar",
+                     "splinef" = "splinef",
+                     "thetaf" = "thetaf",
+                     "Tbats" = "tbats")),
+    
     numericInput("ahead", "Period to Forecast Ahead:", 12),
     
-    numericInput("frequencyInput", "Frequency:", 12),
+    submitButton("Update View"),
     
     tags$hr(),
     
@@ -31,7 +41,7 @@ shinyUI(pageWithSidebar(
     
     textInput("dateColumnName", "Date column name:", "date"),
     
-    textInput("dateFormat", "Date format:", "%Y-%m"),
+    textInput("dateFormat", "Date format:", "%d-%m-%Y"),
     
     tags$hr(),
     div(HTML('<table width="90%" border="0">
@@ -85,7 +95,7 @@ shinyUI(pageWithSidebar(
     
     radioButtons('dec', 'Decimal Mark',
                  c(Comma=',',
-                   "Dot"='.'
+                   'Dot'='.'
                    ),
                  '.'),
     
@@ -106,8 +116,7 @@ shinyUI(pageWithSidebar(
     h3(textOutput("caption")),
     
     tabsetPanel(
-      tabPanel("Exponential smoothing", fluidRow(uiOutput("epxSmoothing"), uiOutput("expSmoothingAccuracyIn"), uiOutput("expSmoothingAccuracyOut"))),
-      tabPanel("Arima", fluidRow(uiOutput("arimaForecast"), uiOutput("arimaForecastAccuracyIn"), uiOutput("arimaForecastAccuracyOut"))),
+      tabPanel("Forecast", fluidRow(uiOutput("forecastWindow"), uiOutput("forecastWindowAccuracyIn"), uiOutput("forecastWindowAccuracyOut"))),
       tabPanel("Timeseries Decomposition", plotOutput("dcompPlot"))
     ),
     
