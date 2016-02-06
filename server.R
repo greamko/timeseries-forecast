@@ -28,18 +28,20 @@ shinyServer(function(input, output) {
       if (is.null(inFile))
         return(NULL)
       csvInput <- read.csv(inFile$datapath, header=input$header, sep=input$sep, 
-                          quote=input$quote)
+                          quote=input$quote, dec=input$dec)
       csvInput[[input$dateColumnName]] <- as.Date(as.yearmon(csvInput[[input$dateColumnName]], input$dateFormat))
-      
+
+            
       strt <- first(csvInput[[input$dateColumnName]])
       strt <- c(year(strt), month(strt))      
       endTS <- last(csvInput[[input$dateColumnName]])
       endTS <- c(year(endTS), month(endTS))      
       
-      x <- ts(csvInput[[input$dataColumnName]], start = strt, frequency = input$frequencyInput)
+      #x <- ts(csvInput[[input$dataColumnName]], start = strt, frequency = findfrequency(csvInput[[input$dataColumnName]]))
+      x <- ts(csvInput[[input$dataColumnName]], start = strt, frequency = findfrequency(csvInput[[input$dataColumnName]]))
       return(x)
-      
-      x <- ts(x, start = strt, end = endTS, frequency = input$frequencyInput)
+      #return(csvInput[[input$dataColumnName]])
+      #x   <- ts(x, start = strt, end = endTS, frequency = input$frequencyInput)
       
     }
   })
@@ -90,11 +92,13 @@ shinyServer(function(input, output) {
     upper <- fitForecast$mean
     upper[] <- fitForecast$upper[,2]
     
-    fitMerged <- cbind(lwr=lower, predicted=c(fitForecast$fitted, fitForecast$mean), upr=upper, actual=fitForecast$x, deparse.level = 1)
-    fitMerged <- ts(fitMerged, frequency = 12, start = strt)
-    
+    fitMerged <- cbind(lwr=lower, predicted=c(fitForecast$fitted, fitForecast$mean), upr=upper, actual=fitForecast$x, testPredicted=c(testForecast$fitted, testForecast$mean))
+    fitMerged <- ts(fitMerged, frequency = input$frequencyInput, start = strt)
+
+        
     dygraph(fitMerged, main = fitForecast$method) %>%
       dySeries("actual", label = "Actual") %>%
+      dySeries("testPredicted", label = "testPredicted") %>%
       dySeries(c("lwr", "predicted", "upr"), label = "Predicted") %>%
       dyRangeSelector(height = 20)
   })
@@ -124,9 +128,6 @@ shinyServer(function(input, output) {
     
     output$accuracyEtsOut <- renderTable(accuracy(testForecast, window(dataSet, start = index(dataSet)[accuracyTestStart])))
     
-    
-    fitForecast <- forecast(fit, h=input$ahead)
-    
     strt <- date_decimal(first(index(fitForecast$x)))
     strt <- c(year(strt), month(strt))
     
@@ -140,7 +141,7 @@ shinyServer(function(input, output) {
     upper[] <- fitForecast$upper[,2]
     fitMerged <- cbind(lwr=lower, predicted=c(fitForecast$fitted, fitForecast$mean), upr=upper, actual=fitForecast$x, deparse.level = 1)
    
-    fitMerged <- ts(fitMerged, frequency = 12, start = strt)
+    fitMerged <- ts(fitMerged, frequency = input$frequencyInput, start = strt)
     
     output$accuracyEts <- renderTable(accuracy(fitForecast))
     

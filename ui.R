@@ -27,11 +27,11 @@ shinyUI(pageWithSidebar(
     checkboxInput('header', 'Header', TRUE),
     
     
-    textInput("dataColumnName", "Data column name:", "sunspot.year"),
+    textInput("dataColumnName", "Data column name:", "value"),
     
-    textInput("dateColumnName", "Date column name:", "time"),
+    textInput("dateColumnName", "Date column name:", "date"),
     
-    textInput("dateFormat", "Date format:", "%Y"),
+    textInput("dateFormat", "Date format:", "%Y-%m"),
     
     tags$hr(),
     div(HTML('<table width="90%" border="0">
@@ -82,6 +82,13 @@ shinyUI(pageWithSidebar(
                    Semicolon=';',
                    Tab='\t'),
                  ','),
+    
+    radioButtons('dec', 'Decimal Mark',
+                 c(Comma=',',
+                   "Dot"='.'
+                   ),
+                 '.'),
+    
     radioButtons('quote', 'Quote',
                  c(None='',
                    'Double Quote'='"',
