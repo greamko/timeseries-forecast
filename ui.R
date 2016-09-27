@@ -25,6 +25,8 @@ shinyUI(pageWithSidebar(
                      "Tbats" = "tbats")),
     
     numericInput("ahead", "Period to Forecast Ahead:", 12),
+
+    numericInput("frequency", "Frequency:", 0),
     
     submitButton("Update View"),
     

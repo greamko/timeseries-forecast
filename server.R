@@ -37,8 +37,13 @@ shinyServer(function(input, output) {
       endTS <- last(csvInput[[input$dateColumnName]])
       endTS <- c(year(endTS), month(endTS))      
       
+      frequency = input$frequency
+      if(frequency == 0){
+        frequency = findfrequency(csvInput[[input$dataColumnName]])
+      }
+
       #x <- ts(csvInput[[input$dataColumnName]], start = strt, frequency = findfrequency(csvInput[[input$dataColumnName]]))
-      x <- ts(csvInput[[input$dataColumnName]], start = strt, frequency = findfrequency(csvInput[[input$dataColumnName]]))
+      x <- ts(csvInput[[input$dataColumnName]], start = strt, frequency = frequency)
       return(x)
       #return(csvInput[[input$dataColumnName]])
       #x   <- ts(x, start = strt, end = endTS, frequency = input$frequencyInput)
@@ -106,7 +111,11 @@ shinyServer(function(input, output) {
   })
   
   output$dcompPlot <- renderPlot({
-    ds_ts <- ts(getDataset(), frequency=findfrequency(getDataset()))
+    frequency = input$frequency
+    if(frequency == 0){
+      frequency = findfrequency(getDataset())
+    }
+    ds_ts <- ts(getDataset(), frequency=frequency)
     f <- decompose(ds_ts)
     plot(f)
   })
